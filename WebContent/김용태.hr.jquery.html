@@ -5,6 +5,153 @@
 <script src='http://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js'></script>
 <link rel='stylesheet' href='http://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css'>
 <link rel='stylesheet' href='https://use.fontawesome.com/releases/v5.6.3/css/all.css'>
+<script>
+const emps = [];   // 사원들
+let empIdSeq = 0;  // 사번 시퀀스
+
+// 메세지를 출력한다.
+function alert(msg, isSuccess=true) {	
+	if(isSuccess) $('#alert').removeClass('alert-danger').addClass('alert-info');
+	else $('#alert').removeClass('alert-info').addClass('alert-danger');
+	$('#msg').text(msg);
+	$('#alert').show();
+	
+	$('#empName').val('');
+	$('#hireDate').val('');	
+}
+
+function closeAlert() {
+	$('#alert').hide();
+}
+
+// 사용자명을 입력했는지 조사한다.
+function isEmpName() {
+	let check = false;
+	if($('#empName').val()) check = true;
+	return check;
+}
+
+// 입사일을 입력했는지 조사한다.
+function isHireDate() {
+	let check = false;
+	if($('#hireDate').val()) check = true;
+	return check;
+}
+
+// 사번를 입력했는지 조사한다.
+function isEmpId (){
+	let check = false;
+	if($(':radio:checked').length) check = true;
+	return check;
+}
+
+function listEmployees() {
+	$('#empList').empty();
+	
+	if(emps.length){	
+		let empList = [];
+		
+		$.each(emps, (idx, emp) => {
+			empList.unshift(
+				`<tr>
+					<th></th>
+					<th>
+						<div class='form-check form-check-inline'>										
+							<input type='radio' class='form-check-input' name='empId' id='empId'/>
+							<label class='form-check-label' for='empId'>&nbsp; ${emp.empId}</label>
+						</div>
+					</th>
+					<td>${emp.empName}</td>
+					<td>${emp.hireDate}</td>
+				</tr>`
+			);
+		});
+		
+		$('#empList').append(empList.join(''));
+	} else {
+		$('#empList').append("<tr><td colspan='4' class='text-center'>사원이 없습니다.</td></tr>");
+	}
+}
+
+// handler를 등록한다.
+function init() {
+	closeAlert();	
+	$('#closeBtn').click(() => closeAlert());
+	
+	// 사원 추가
+	$('#addEmpBtn').click(() => {
+		if(isEmpName() && isHireDate()){			
+			let emp = {
+				empId: ++empIdSeq,
+				empName: $('#empName').val(),
+				salary: 0,
+				hireDate: $('#hireDate').val()
+			}		
+			emps.push(emp);			
+			
+			listEmployees();
+			alert('사원을 추가했습니다.');
+		}else{
+			alert('사원명과 입사일을 입력하세요.', false);
+		}
+	});	
+	
+	// 사원 수정
+	$('#fixEmpBtn').click(() => {
+		if(isEmpId() && isEmpName() && isHireDate()){
+			let empId = $(':checked').parent().text().trim();
+			
+			$.each(emps, (idx, emp) => {
+				if(emp.empId == empId) {
+					emp.empName = $('#empName').val();	
+					emp.hireDate = $('#hireDate').val();					
+					return false;
+				}			
+			});
+			
+			listEmployees();
+			alert('사원을 수정했습니다.');
+		}else{
+			alert('사번, 사원명, 입사일을 입력하세요.', false);
+		}
+	});
+
+	// 사원 삭제
+	$('#delEmpBtn').click(() => {
+		if(isEmpId()) $('#delEmpModal').modal('show');
+		else alert('삭제할 사번를 입력하세요.', false);
+	});
+	
+	// 사원 삭제
+	$('#delEmpOkBtn').click(() => {
+		let empId = $(':checked').parent().text().trim();
+		
+		$.each(emps, (idx, emp) => {
+			if(emp.empId == empId){
+				emps.splice(emps.indexOf(emp), 1);
+				return false;
+			}			
+		});
+		
+		$('#delEmpModal').modal('hide');
+		
+		listEmployees();
+		alert('사원을 삭제했습니다.');
+	});
+	
+	// 사번를 선택하면
+	$('#empList').on({
+		change() {
+			let emp = $(this).parents('tr').find('td');
+			
+			$('#empName').val(emp.eq(0).text());
+			$('#hireDate').val(emp.eq(1).text());
+		}
+	}, '#empId');
+}
+
+$(init);
+</script>
 <style>
 .jumbotron {
   padding: 1rem; 
@@ -30,25 +177,26 @@
 					<button type='button' class='btn btn-primary w-24'>
 						<i class='fas fa-align-justify'></i> 목록
 					</button>
-					<button type='submit' class='btn btn-success w-24'>
+					<button type='button' class='btn btn-success w-24' id='addEmpBtn'>
 						<i class='fas fa-plus'></i> 추가
 					</button>
-					<button type='submit' class='btn btn-info w-24'>
+					<button type='button' class='btn btn-info w-24' id='fixEmpBtn'>
 						<i class='fas fa-edit'></i> 수정
 					</button>
-					<button type='button' class='btn btn-warning w-24' data-toggle='modal' data-target='#delModal'>
+					<button type='button' class='btn btn-warning w-24' id='delEmpBtn'
+						data-toggle='modal' data-target='#delModal'>
 						<i class='fas fa-trash-alt'></i> 삭제
 					</button>
 				</nav>
 			</div>
 		</div>
 
-		<div class='row mb-3'>
+		<div class='row mb-3'>					
 			<div class='col'>
 				<div class='form-group row'>
 					<label class='col-4 col-form-label'>사원명: </label>
 					<div class='col'>
-						<input type='text' class='form-control' name='empName'>	
+						<input type='text' class='form-control' name='empName' id='empName'>	
 					</div>
 				</div>
 			</div>
@@ -56,37 +204,32 @@
 				<div class='form-group row'>
 					<label class='col-4 col-form-label'>입사일: </label>
 					<div class='col'>
-						<input type='date' class='form-control' name='hireDate'>
+						<input type='date' class='form-control' name='hireDate' id='hireDate'>
 					</div>
 				</div>
 			</div>
+			<div class='col'>
+				<div id='alert' class='alert alert-dismissible fade show p-1 pl-4 mb-1'>				
+					<p class='m-0' id='msg'></p>
+					<button type='button' class='p-0 close' tabindex='-1' id='closeBtn'>
+						<span>&times;</span>
+					</button>		
+				</div>		
+			</div>			
 		</div>
 		<div class='row'>
 			<div class='col'>
-				<table class='table justify-content-around'>
+				<table class='table'>
 					<thead>
 						<tr>
+							<th></th>
 							<th>사번</th>
 							<th>이름</th>
 							<th>입사일</th>
 						</tr>
 					</thead>
-					<tbody>
-						<tr>
-							<td><input type='radio' />&nbsp;&nbsp;&nbsp;1</td>
-							<td>최한석</td>
-							<td>2025-3-21</td>
-						</tr>
-						<tr>
-							<td><input type='radio' />&nbsp;&nbsp;&nbsp;2</td>
-							<td>한아름</td>
-							<td>2025-3-22</td>
-						</tr>
-						<tr>
-							<td><input type='radio' />&nbsp;&nbsp;&nbsp;3</td>
-							<td>양승일</td>
-							<td>2025-3-23</td>
-						</tr>
+					<tbody id='empList'>
+						<tr><td colspan='4' class='text-center'>사원이 없습니다.</td></tr>
 					</tbody>
 				</table>
 			</div>
@@ -94,7 +237,7 @@
 	</form>	
 </div>
 
-<div id='delModal' class='modal fade' tabindex='-1'>
+<div id='delEmpModal' class='modal fade' tabindex='-1'>
 	<div class='modal-dialog'>
 		<div class='modal-content'>
 			<div class='modal-header'>			
@@ -107,7 +250,7 @@
 			</div>
 			<div class='modal-footer'>
 				<button type='button' class='btn btn-secondary' data-dismiss='modal'>아니오</button>
-				<a href='#' class='btn btn-primary'>예</a>
+				<button type='button' class='btn btn-primary' id='delEmpOkBtn'>예</button>
 			</div>
 		</div>
 	</div>
