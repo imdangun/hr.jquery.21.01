@@ -24,24 +24,9 @@ function closeAlert() {
 	$('#alert').hide();
 }
 
-// 사용자명을 입력했는지 조사한다.
-function isEmpName() {
+function isVal(field) {
 	let check = false;
-	if($('#empName').val()) check = true;
-	return check;
-}
-
-// 입사일을 입력했는지 조사한다.
-function isHireDate() {
-	let check = false;
-	if($('#hireDate').val()) check = true;
-	return check;
-}
-
-// 사번를 입력했는지 조사한다.
-function isEmpId (){
-	let check = false;
-	if($(':radio:checked').length) check = true;
+	if(field.length && field.val()) check = true;
 	return check;
 }
 
@@ -57,7 +42,7 @@ function listEmployees() {
 					<th></th>
 					<th>
 						<div class='form-check form-check-inline'>										
-							<input type='radio' class='form-check-input' name='empId' id='empId'/>
+							<input type='radio' class='form-check-input' id='empId' value='${emp.empId}'/>
 							<label class='form-check-label' for='empId'>&nbsp; ${emp.empId}</label>
 						</div>
 					</th>
@@ -80,7 +65,7 @@ function init() {
 	
 	// 사원 추가
 	$('#addEmpBtn').click(() => {
-		if(isEmpName() && isHireDate()){			
+		if(isVal($('#empName')) && isVal($('#hireDate'))){			
 			let emp = {
 				empId: ++empIdSeq,
 				empName: $('#empName').val(),
@@ -98,8 +83,8 @@ function init() {
 	
 	// 사원 수정
 	$('#fixEmpBtn').click(() => {
-		if(isEmpId() && isEmpName() && isHireDate()){
-			let empId = $(':checked').parent().text().trim();
+		if(isVal($('#empId:checked')) && isVal($('#empName')) && isVal($('#hireDate'))){			
+			let empId = $(':checked').val();
 			
 			$.each(emps, (idx, emp) => {
 				if(emp.empId == empId) {
@@ -118,13 +103,14 @@ function init() {
 
 	// 사원 삭제
 	$('#delEmpBtn').click(() => {
-		if(isEmpId()) $('#delEmpModal').modal('show');
+		if(isVal($('#empId:checked'))) $('#delEmpModal').modal('show');
 		else alert('삭제할 사번를 입력하세요.', false);
 	});
 	
 	// 사원 삭제
 	$('#delEmpOkBtn').click(() => {
-		let empId = $(':checked').parent().text().trim();
+		//let empId = $(':checked').parent().text().trim();
+		let empId = $(':checked').val();
 		
 		$.each(emps, (idx, emp) => {
 			if(emp.empId == empId){
