@@ -7,7 +7,40 @@
 <link rel='stylesheet' href='https://use.fontawesome.com/releases/v5.6.3/css/all.css'>
 
 <script>
+const emps = [];
+let empIdSeq = 0;
 
+function alert(msg, isSuccess=true) {
+	if(isSuccess) $('#alert').removeClass('alert-danager').addClass('alert-success');
+	else $('#alert').removeClass('alert-success').addClass('alert-danger');
+	
+	$('#msg').text(msg);
+	$('#alert').show();
+	
+	$('#empName').val('');
+	$('#hireDate').val('');
+}
+
+function closeAlert() {
+	$('#alert').hide();
+}
+
+function isVal(field){
+	let check = false;
+	if(field.length && field.val()) check = true;
+	
+	return check;
+}
+
+function listEmployees() {
+	$('#empList').empty();
+	
+	if(emps.length) {
+		
+	} else {
+		$('#empList').append('<tr><td colspan="4" class="text-center">사원이 없습니다.</td></tr>');
+	}
+}
 </script>
 
 <style>

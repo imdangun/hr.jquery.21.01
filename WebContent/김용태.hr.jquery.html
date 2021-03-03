@@ -11,8 +11,8 @@ const emps = [];
 let empIdSeq = 0;
 
 function alert(msg, isSuccess=true) {
-	if(isSuccess) $('#alert').removeClass('alert-danger').addClass('alert-info');
-	else $('#alert').removeClass('alert-info').addClass('alert-danager');
+	if(isSuccess) $('#alert').removeClass('alert-danger').addClass('alert-success');
+	else $('#alert').removeClass('alert-success').addClass('alert-danager');
 	
 	$('#msg').text(msg);
 	$('#alert').show();
