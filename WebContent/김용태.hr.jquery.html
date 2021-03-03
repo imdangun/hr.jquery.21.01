@@ -12,7 +12,7 @@ let empIdSeq = 0;
 
 function alert(msg, isSuccess=true) {
 	if(isSuccess) $('#alert').removeClass('alert-danger').addClass('alert-success');
-	else $('#alert').removeClass('alert-success').addClass('alert-danager');
+	else $('#alert').removeClass('alert-success').addClass('alert-danger');
 	
 	$('#msg').text(msg);
 	$('#alert').show();
@@ -25,7 +25,7 @@ function closeAlert() {
 	$('#alert').hide();
 }
 
-function isVal(field) {
+function isVal(field){
 	let check = false;
 	if(field.length && field.val()) check = true;
 	
@@ -94,7 +94,7 @@ function init() {
 					
 					return false;
 				}
-			});	
+			});
 			
 			listEmployees();
 			alert('사원을 수정했습니다.');
@@ -103,12 +103,21 @@ function init() {
 		}
 	});
 	
+	//사원 삭제
+	$('#delEmpBtn').click(() => {
+		if(isVal($('#empId:checked'))) {
+			$('#delEmpModal').modal();
+		} else {
+			alert('사번을 입력하세요.', false);
+		}
+	});
+	
 	$('#delEmpOkBtn').click(() => {
 		let empId = $(':checked').val();
 		
 		$.each(emps, (idx, emp) => {
 			if(emp.empId == empId) {
-				emps.splice(emps.indexOf(emp), 1);
+				emps.splice(idx, 1);
 				return false;
 			}
 		});
@@ -163,8 +172,7 @@ $(init);
 				<button type='button' class='btn btn-info w-24' id='fixEmpBtn'>
 					<i class='fas fa-edit'></i> 수정
 				</button>
-				<button type='button' class='btn btn-warning w-24' id='delEmpBtn'
-					data-toggle='modal' data-target='#delEmpModal'>
+				<button type='button' class='btn btn-warning w-24' id='delEmpBtn'>
 					<i class='fas fa-trash-alt'></i> 삭제
 				</button>
 			</nav>
@@ -187,6 +195,7 @@ $(init);
 			</div>		
 		</div>			
 	</div>
+	
 	<div class='row'>
 		<div class='col'>
 			<table class='table'>
