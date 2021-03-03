@@ -5,19 +5,20 @@
 <script src='http://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js'></script>
 <link rel='stylesheet' href='http://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css'>
 <link rel='stylesheet' href='https://use.fontawesome.com/releases/v5.6.3/css/all.css'>
-<script>
-const emps = [];   // 사원들
-let empIdSeq = 0;  // 사번 시퀀스
 
-// 메세지를 출력한다.
-function alert(msg, isSuccess=true) {	
+<script>
+const emps = [];
+let empIdSeq = 0;
+
+function alert(msg, isSuccess=true) {
 	if(isSuccess) $('#alert').removeClass('alert-danger').addClass('alert-info');
-	else $('#alert').removeClass('alert-info').addClass('alert-danger');
+	else $('#alert').removeClass('alert-info').addClass('alert-danager');
+	
 	$('#msg').text(msg);
 	$('#alert').show();
 	
 	$('#empName').val('');
-	$('#hireDate').val('');	
+	$('#hireDate').val('');
 }
 
 function closeAlert() {
@@ -27,13 +28,14 @@ function closeAlert() {
 function isVal(field) {
 	let check = false;
 	if(field.length && field.val()) check = true;
+	
 	return check;
 }
 
 function listEmployees() {
 	$('#empList').empty();
 	
-	if(emps.length){	
+	if(emps.length) {
 		let empList = [];
 		
 		$.each(emps, (idx, emp) => {
@@ -41,8 +43,9 @@ function listEmployees() {
 				`<tr>
 					<th></th>
 					<th>
-						<div class='form-check form-check-inline'>										
-							<input type='radio' class='form-check-input' id='empId' value='${emp.empId}'/>
+						<div class='form-check form-check-inline'>
+							<input type='radio' class='form-check-input' 
+								value='${emp.empId}' name='empId' id='empId' />
 							<label class='form-check-label' for='empId'>&nbsp; ${emp.empId}</label>
 						</div>
 					</th>
@@ -54,69 +57,60 @@ function listEmployees() {
 		
 		$('#empList').append(empList.join(''));
 	} else {
-		$('#empList').append("<tr><td colspan='4' class='text-center'>사원이 없습니다.</td></tr>");
+		$('#empList').append('<tr><td colspan=4 class=text-center>사원이 없습니다.</td></tr>');
 	}
 }
 
-// handler를 등록한다.
 function init() {
-	closeAlert();	
-	$('#closeBtn').click(() => closeAlert());
+	closeAlert();
+	$('#closeAlertBtn').click(() => closeAlert());
 	
-	// 사원 추가
+	//사원 추가
 	$('#addEmpBtn').click(() => {
-		if(isVal($('#empName')) && isVal($('#hireDate'))){			
+		if(isVal($('#empName')) && isVal($('#hireDate'))) {
 			let emp = {
 				empId: ++empIdSeq,
 				empName: $('#empName').val(),
-				salary: 0,
 				hireDate: $('#hireDate').val()
-			}		
-			emps.push(emp);			
+			};
+			emps.push(emp);
 			
 			listEmployees();
 			alert('사원을 추가했습니다.');
-		}else{
+		} else {
 			alert('사원명과 입사일을 입력하세요.', false);
 		}
-	});	
+	});
 	
-	// 사원 수정
+	//사원 수정
 	$('#fixEmpBtn').click(() => {
-		if(isVal($('#empId:checked')) && isVal($('#empName')) && isVal($('#hireDate'))){			
+		if(isVal($('#empId:checked')) && isVal($('#empName')) && isVal($('#hireDate'))) {
 			let empId = $(':checked').val();
 			
 			$.each(emps, (idx, emp) => {
 				if(emp.empId == empId) {
-					emp.empName = $('#empName').val();	
-					emp.hireDate = $('#hireDate').val();					
+					emp.empName = $('#empName').val();
+					emp.hireDate = $('#hireDate').val();
+					
 					return false;
-				}			
-			});
+				}
+			});	
 			
 			listEmployees();
 			alert('사원을 수정했습니다.');
-		}else{
+		} else {
 			alert('사번, 사원명, 입사일을 입력하세요.', false);
 		}
 	});
-
-	// 사원 삭제
-	$('#delEmpBtn').click(() => {
-		if(isVal($('#empId:checked'))) $('#delEmpModal').modal('show');
-		else alert('삭제할 사번를 입력하세요.', false);
-	});
 	
-	// 사원 삭제
 	$('#delEmpOkBtn').click(() => {
-		//let empId = $(':checked').parent().text().trim();
 		let empId = $(':checked').val();
 		
 		$.each(emps, (idx, emp) => {
-			if(emp.empId == empId){
+			if(emp.empId == empId) {
 				emps.splice(emps.indexOf(emp), 1);
 				return false;
-			}			
+			}
 		});
 		
 		$('#delEmpModal').modal('hide');
@@ -125,7 +119,6 @@ function init() {
 		alert('사원을 삭제했습니다.');
 	});
 	
-	// 사번를 선택하면
 	$('#empList').on({
 		change() {
 			let emp = $(this).parents('tr').find('td');
@@ -148,6 +141,7 @@ $(init);
 	width: 24.5%;
 }
 </style>
+
 <div class='container'>
 	<div class='row'>
 		<div class='col'>
@@ -170,7 +164,7 @@ $(init);
 					<i class='fas fa-edit'></i> 수정
 				</button>
 				<button type='button' class='btn btn-warning w-24' id='delEmpBtn'
-					data-toggle='modal' data-target='#delModal'>
+					data-toggle='modal' data-target='#delEmpModal'>
 					<i class='fas fa-trash-alt'></i> 삭제
 				</button>
 			</nav>
@@ -187,7 +181,7 @@ $(init);
 		<div class='col'>
 			<div id='alert' class='alert alert-dismissible fade show p-1 pl-4 mb-1'>				
 				<p class='m-0' id='msg'></p>
-				<button type='button' class='p-0 close' tabindex='-1' id='closeBtn'>
+				<button type='button' class='p-0 close' tabindex='-1' id='closeAlertBtn'>
 					<span>&times;</span>
 				</button>		
 			</div>		
